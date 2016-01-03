@@ -53,7 +53,20 @@ public abstract class Document {
 		// TODO: Implement this method so that you can call it from the 
 	    // getNumSyllables method in BasicDocument (module 1) and 
 	    // EfficientDocument (module 2).
-	    return 0;
+		
+		int numSyllables = 0 ; 
+		
+		BasicDocument doc = new BasicDocument(word);
+		
+        List<String> syllables = doc.getTokens("[^aeiouyAEIOUY]*[aeiouyAEIOUY]+[^aeiouyAEIOUY]*") ; //but this is tokens for the WHOLE doc
+        numSyllables = syllables.size(); 
+        
+		if(syllables.size() > 1)
+			if(syllables.get(numSyllables-1).equals("e") || syllables.get(numSyllables-1).equals("E")) 
+				numSyllables-- ; 
+					
+				
+	    return numSyllables ;
 	}
 	
 	/** A method for testing
@@ -117,7 +130,12 @@ public abstract class Document {
 	public double getFleschScore()
 	{
 	    // TODO: Implement this method
-	    return 0.0;
+		int noWords = getNumWords() ;
+		int noSentences = getNumSentences() ;
+		int noSyllables = getNumSyllables() ; 
+		
+		double FleschScore = 206.835 - 1.015*((double) noWords/noSentences) - 84.6*((double) noSyllables/noWords) ;
+	    return FleschScore ;
 	}
 	
 	
