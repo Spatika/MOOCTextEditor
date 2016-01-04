@@ -42,10 +42,37 @@ public class EfficientDocument extends Document {
 		// Provide this first line in the starter code.  
 		// Words are only strings of letters.  No numbers.
 		List<String> tokens = getTokens("[!?.]+|[a-zA-Z]+");
+		numSentences = 0 ; 
+		numWords = 0 ;
+		numSyllables = 0 ;
 		
 		// TODO: Finish this method.  Remember the countSyllables method from 
 		// Document.  That will come in handy here.
-	}
+		int i ;
+		for(i = 0 ; i < tokens.size(); i++) {
+			if(isWord(tokens.get(i))) {
+				numWords++ ;
+				
+				numSyllables += countSyllables(tokens.get(i)) ;
+			}
+			
+			else
+				numSentences++ ;
+			
+		}//end of tokens loop
+		
+		//check if last token does or doesn't have punctuation = !, ?, . 
+		//if it doesn't, increment numSentences by 1, else it has already been taken care of
+		
+		if(tokens.size() >= 1) { 
+			String lastToken = tokens.get(tokens.size() - 1) ; 
+		
+			if(!(lastToken.contains("!") | lastToken.contains("?") | lastToken.contains("."))) {
+				numSentences++ ;
+			}
+		}
+		
+	}//end of ProcessText
 	
 	
 	/**
@@ -57,8 +84,8 @@ public class EfficientDocument extends Document {
 	 */
 	@Override
 	public int getNumWords() {
-		//TODO: write this method.  Hint: It's simple
-	    return 0;
+		
+	    return numWords;
 	}
 
 	/**
@@ -71,8 +98,8 @@ public class EfficientDocument extends Document {
 	 */
 	@Override
 	public int getNumSentences() {
-        //TODO: write this method.  Hint: It's simple
-        return 0;
+        
+        return numSentences;
 	}
 
 	/**
@@ -85,8 +112,8 @@ public class EfficientDocument extends Document {
 	 */
 	@Override
 	public int getNumSyllables() {
-        //TODO: write this method.  Hint: It's simple
-        return 0;
+        
+        return numSyllables;
 	}
 	
 	// Can be used for testing
