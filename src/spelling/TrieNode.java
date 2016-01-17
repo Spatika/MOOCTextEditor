@@ -6,12 +6,14 @@ import java.util.Set;
 /** 
  * Represents a node in a Trie
  * @author UC San Diego Intermediate Programming MOOC Team
- *
  */
+
 class TrieNode {
 	private HashMap<Character, TrieNode> children; 
 	private String text;  // Maybe omit for space
-	private boolean isWord;
+	
+	
+	private boolean isWord; //if a word ends at this node
 	
 	/** Create a new TrieNode */
 	public TrieNode()
