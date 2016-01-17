@@ -1,13 +1,14 @@
 package spelling;
 
-import java.util.List;
-import java.util.Set;
-import java.util.Collection;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+import java.util.Set;
 
 /** 
- * An trie data structure that implements the Dictionary and the AutoComplete ADT
+ * An trie data structure that implements the Dictionary and the AutoComplete ADT - interfaces
  * @author Spatika
  *
  */
@@ -29,16 +30,34 @@ public class AutoCompleteDictionaryTrie implements  Dictionary, AutoComplete {
 	 * That is, you should convert the string to all lower case as you insert it. */
 	public boolean addWord(String word)
 	{
-	    //TODO: Implement this method.
-		
-		String lowerCase_word = word.toLowerCase() ;
+	   
+		String lowerCase_word = word.toLowerCase() ;  
+
+		TrieNode curNode = new TrieNode() ; 
 		
 		if(isWord(lowerCase_word))
-			return false;
-	    
-		//insert in correct position ugh
-	
-	    size++ ; 
+			return false ;
+		
+		curNode = root ; 
+		int i ; 
+		
+		for(i = 0 ; i < lowerCase_word.length() ; i++) {
+			
+			TrieNode nextNode = curNode.getChild(lowerCase_word.charAt(i)) ; 
+			
+			if(nextNode != null)
+				curNode = nextNode ; 
+			
+			else {
+				curNode = curNode.insert(lowerCase_word.charAt(i)) ;  //if one of the letters isn't there then it's not a word in the trie, right?
+
+			}
+		}
+		
+		curNode.setEndsWord(true);
+		size++ ;
+		
+		
 	    return true ;
 	}
 	
@@ -46,9 +65,10 @@ public class AutoCompleteDictionaryTrie implements  Dictionary, AutoComplete {
 	 * Return the number of words in the dictionary.  This is NOT necessarily the same
 	 * as the number of TrieNodes in the trie.
 	 */
-	public int size()
+	public int size() //size of dictionary, NOT number of nodes
 	{
 	    //TODO: Implement this method
+
 	    return size ;
 	}
 	
@@ -58,7 +78,35 @@ public class AutoCompleteDictionaryTrie implements  Dictionary, AutoComplete {
 	public boolean isWord(String s) 
 	{
 	    // TODO: Implement this method
-		return false ;
+		
+		if(s == "") //empty string
+			return false ;
+		
+		String lowerCase_word = s.toLowerCase() ; 
+		
+		TrieNode curNode = new TrieNode() ; 
+		
+		curNode = root ; 
+		int i ; 
+		
+		for(i = 0 ; i < lowerCase_word.length() ; i++) {
+			
+			TrieNode nextNode = curNode.getChild(lowerCase_word.charAt(i)) ; 
+			
+			if(nextNode != null)
+				curNode = nextNode ; 
+			else
+				return false ;  //if one of the letters isn't there then it's not a word in the trie, right?
+ 
+		}
+		
+		//another condition where false must be returned
+		if(curNode.endsWord() == false) {
+			return false ;
+		}
+		
+		return true ; 
+			
 	}
 
 	/** 
@@ -86,7 +134,88 @@ public class AutoCompleteDictionaryTrie implements  Dictionary, AutoComplete {
     	 //       Add all of its child nodes to the back of the queue
     	 // Return the list of completions
     	 
-         return null;
+    	 
+    	 List<String> completions = new ArrayList<String>() ;
+    	 
+    	 prefix = prefix.toLowerCase() ;
+    	 
+
+ 		 System.out.println("prefix is "+ prefix) ;
+    	 
+    	 TrieNode curNode = new TrieNode() ; 
+ 		
+ 		 curNode = root ; 
+ 		 int j ;
+ 		 
+ 		 for(j = 0 ; j < prefix.length() ; j++) {
+
+  			//System.out.println(prefix.charAt(j)); -- is h
+  			
+ 			TrieNode nextNode = curNode.getChild(prefix.charAt(j)) ; 
+ 			//System.out.println(curNode.getValidNextCharacters()); - is empty
+ 			//System.out.println(nextNode); -- null
+ 			
+ 			if(nextNode != null)
+ 				curNode = nextNode ;
+ 			
+ 			else {  //prefix isn't in here
+ 				break ;
+ 			}
+ 		 }
+
+ 		 System.out.println("curnode text is "+ curNode.getText()) ;
+ 		
+ 		
+ 		 //empty string can be prefix 
+ 		 if(prefix != "" && j < prefix.length())
+ 			 return completions ; 
+ 		 
+ 		 int numAdded = 0 ;
+ 		 
+ 		 if(curNode.endsWord()) {
+ 			 completions.add(curNode.getText());
+ 			 numAdded++;
+ 			 
+ 		 }
+ 		 //reached here --> prefix is in the Trie, perform BFS to populate completions
+ 		 Queue<TrieNode> qyoo = new LinkedList<TrieNode>() ;
+ 		 
+ 		 Set<Character> validCharsNext = curNode.getValidNextCharacters() ;
+ 		 
+ 		 System.out.println(validCharsNext) ;
+ 		
+ 	     for (Iterator<Character> it = validCharsNext.iterator(); it.hasNext(); ) {
+ 		        Character c = it.next() ;
+ 		        qyoo.add(curNode.getChild(c)) ;
+ 		 }
+ 	 
+ 	      
+ 		
+ 		 TrieNode x ;
+ 		 
+ 		 while(!(qyoo.isEmpty()) && (numAdded < numCompletions)) {
+ 			 x = qyoo.remove() ;
+ 			 
+ 			 //System.out.println("ends word of " + x.getText() + " is " + x.endsWord()) ;
+ 			 
+ 			 if(x.endsWord()) {
+ 				 
+ 				 completions.add(x.getText()) ;
+ 				 numAdded++ ;
+ 			 }//endif
+ 				 
+ 				 //add all child nodes to queue
+ 			 //validCharsNext.clear() ;
+ 			 validCharsNext = x.getValidNextCharacters() ;
+ 		 		 
+ 		 	 for (Iterator<Character> idx = validCharsNext.iterator(); idx.hasNext(); ) {
+ 		 		       Character c = idx.next() ;
+ 		 		       qyoo.add(x.getChild(c)) ;
+ 		 	 }//endfor
+ 				 
+ 		 }//end while
+    	 
+         return completions ;
      }
 
  	// For debugging

@@ -137,6 +137,7 @@ public class AutoCompleteDictionaryTrieTester {
 		assertEquals(0, completions.size());
 		
 		completions = smallDict.predictCompletions("",  4);
+		System.out.println(completions) ;
 		assertEquals(4, completions.size());
 		assertTrue(completions.contains("a"));
 		assertTrue(completions.contains("he"));
@@ -146,6 +147,7 @@ public class AutoCompleteDictionaryTrieTester {
 		assertTrue(twoOfThree);
 		
 		completions = smallDict.predictCompletions("he", 2);
+		System.out.println(completions) ;
 		boolean allIn = completions.contains("he") && 
 				(completions.contains("hem") || completions.contains("hey"));
 		assertEquals(2, completions.size());
