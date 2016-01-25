@@ -13,7 +13,7 @@ import java.util.List;
  * @author UC San Diego Intermediate MOOC team
  *
  */
-public class NearbyWords implements SpellingSuggest {
+public class NearbyWords implements SpellingSuggest { //implements 'suggestions(String, int)' method
 	// THRESHOLD to determine how many words to look through when looking
 	// for spelling suggestions (stops prohibitively long searching)
 	// For use in the Optional Optimization in Part 2.
@@ -75,8 +75,45 @@ public class NearbyWords implements SpellingSuggest {
 	 * @param wordsOnly controls whether to return only words or any String
 	 * @return
 	 */
-	public void insertions(String s, List<String> currentList, boolean wordsOnly ) {
-		// TODO: Implement this method  
+	public void insertions(String s, List<String> currentList, boolean wordsOnly ) { 
+		
+		
+		
+		//can insert at k+1 diff. positions
+		for(int idx = 0 ; idx < s.length()+1 ; idx++) {
+			for(int charCode = (int)'a'; charCode <= (int)'z'; charCode++) {
+				StringBuffer sb = new StringBuffer() ;
+				
+				if(idx == 0) {
+				 sb.append((char)charCode) ; 
+				 sb.append(s) ; 
+				}
+				
+				
+				
+				else if(idx == s.length()) {
+				 sb.append(s) ;
+				 sb.append((char)charCode); 
+				}
+				
+					
+				else {
+						sb.append(s.substring(0, idx)) ;
+						sb.append((char)charCode) ; 
+						sb.append(s.substring(idx)) ;
+					}
+				
+		
+			    // if the item isn't in the list, isn't the original string, and
+				// (if wordsOnly is true) is a real word, add to the list
+				if(!currentList.contains(sb.toString()) && 
+						(!wordsOnly||dict.isWord(sb.toString())) &&
+						!s.equals(sb.toString())) {
+					currentList.add(sb.toString());
+				}//endif
+		
+		}//end for looking at all characters in particular position	
+	  }//end looking at all positions
 	}
 
 	/** Add to the currentList Strings that are one character deletion away
@@ -88,6 +125,29 @@ public class NearbyWords implements SpellingSuggest {
 	 */
 	public void deletions(String s, List<String> currentList, boolean wordsOnly ) {
 		// TODO: Implement this method
+		
+		for(int i = 0 ; i < s.length() ; i++) {
+			StringBuffer sb ; 
+			
+			if(i == 0) //first index
+				sb = new StringBuffer(s.substring(1)); 
+			
+			else if(i== s.length()-1) //last index
+				sb = new StringBuffer(s.substring(0,s.length()-1)); //exclusive of endIndex
+				
+			else {	
+			
+				sb = new StringBuffer(s.substring(0, i)); //exclusive of i - endIndex
+				sb.append(s.substring(i+1)) ; }
+			
+				// if the item isn't in the list, isn't the original string, and
+				// (if wordsOnly is true) is a real word, add to the list
+				if(!currentList.contains(sb.toString()) && 
+						(!wordsOnly||dict.isWord(sb.toString())) &&
+						!s.equals(sb.toString())) {
+					currentList.add(sb.toString());
+				}//endif
+		}//endfor
 	}
 
 	/** Add to the currentList Strings that are one character deletion away
@@ -100,18 +160,38 @@ public class NearbyWords implements SpellingSuggest {
 	public List<String> suggestions(String word, int numSuggestions) {
 
 		// initial variables
+		if(numSuggestions > THRESHOLD)
+			numSuggestions = THRESHOLD ;
+		
 		List<String> queue = new LinkedList<String>();     // String to explore
 		HashSet<String> visited = new HashSet<String>();   // to avoid exploring the same  
 														   // string multiple times
 		List<String> retList = new LinkedList<String>();   // words to return
-		 
 		
 		// insert first node
 		queue.add(word);
 		visited.add(word);
-					
-		// TODO: Implement the remainder of this method, see assignment for algorithm
 		
+		while(!queue.isEmpty() && retList.size() < numSuggestions) {
+			String curWord = queue.remove(0) ; //first in queue
+		
+		      List<String> distOne = distanceOne(curWord, false) ; //get neighbors
+		      
+		      for(int i = 0 ; i < distOne.size() ; i++) { //for each neighbor
+		    	if(!visited.contains(distOne.get(i))) { 
+		    	  String curNeighbor = distOne.get(i) ;
+		    		
+		    	  queue.add(curNeighbor) ; //add mutation to q to look at it's neighbors later
+		    	  visited.add(curNeighbor) ; //also make sure its visited
+		    	  
+		    	  if(dict.isWord(curNeighbor))	
+		    	  	retList.add(curNeighbor) ; 	
+		    	}//endif
+		      }//endfor
+		   			
+		}//endwhile
+		
+
 		return retList;
 
 	}	
